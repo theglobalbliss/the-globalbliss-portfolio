@@ -13,20 +13,20 @@
         <!-- START ABOUT TEXT DESIGN AREA -->
         <div class="col-lg-8">
           <div class="about-content-part wow fadeInUp delay-0-2s">
-            <h2>{{"I’m"}} Bentos Walker, a product designer.</h2>
+            <h2>{{"I’m"}} Anuoluwapo Bliss, a versatile  creative.</h2>
             <p>
-              I am a San francisco-based product designer with a focus on web
-              design, illustration, a visual development. I have a diverse range
+              A Nigerian based graphic designer and website developer passionate
+              about creating clean visuals, functional websites, and digital 
               of experience having worked across various fields and industries.
             </p>
             <p>
-              Contrary to popular belief, Lorem Ipsum is not simply random text.
-              It has roots in a piece of classical Latin literature from 45 BC,
-              making it over 2000 years old. Richard McClintock, a Latin
-              professor at Hampden-Sydney College in Virginia, looked up one of
-              the more obscure Latin words, consectetur, from a Lorem Ipsum
-              passage, and going through the cites of the word in classical
-              literature, discovered the undoubtable source.
+              My work blends creativity, strategy, and attention to detail.
+              I help brands communicate better, look more professional, and
+              connect with their audience through designs that are visually 
+              compelling, user-friendly, and impactful.
+              Whether I’m designing brand visuals or building websites,
+              my goal is simple: to create work that doesn’t just look good, 
+              but works beautifully.
             </p>
             <div class="hero-btns">
               <NuxtLink to="/contact" class="theme-btn"

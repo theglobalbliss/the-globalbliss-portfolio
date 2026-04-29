@@ -13,7 +13,7 @@ import { Navigation, EffectFade } from "swiper/modules";
         <div class="row">
           <div class="col-xl-12 col-lg-12">
             <div class="section-title text-center wow fadeInUp delay-0-2s">
-              <p>Testinomials</p>
+              <p>Testimonials</p>
               <h2>What clients say!</h2>
             </div>
           </div>
@@ -38,18 +38,19 @@ import { Navigation, EffectFade } from "swiper/modules";
               <SwiperSlide class="testimonial-item wow fadeInUp delay-0-3s">
                 <div class="author">
                   <img
-                    src="assets/images/testimonials/author1.jpg"
+                    src="assets/images/testimonials/author2.jpg"
                     alt="Author"
                   />
                 </div>
                 <div class="text">
-                  Financial planners help people to knowledge in about how to
-                  invest and in save their moneye the most efficient way eve
-                  plan ners help people tioniio know ledige in about how.
+                  We are happy to work with GlobalBliss. Their expertise, combined
+                  with the client’s vision, brings great ideas to life especially 
+                  in the areas of website development and management.
+                  We are pleased to partner with them.
                 </div>
                 <div class="testi-des">
-                  <h5>Zonathon Doe</h5>
-                  <span>CEO & Founder X</span>
+                  <h5>Gbenga Oloniniran</h5>
+                  <span>Executive Director/Editor-In-Chief, Third Lens Media</span>
                 </div>
               </SwiperSlide>
               <!-- / END SINGLE TESTIMONIALS DESIGN AREA -->
@@ -57,56 +58,21 @@ import { Navigation, EffectFade } from "swiper/modules";
               <SwiperSlide class="testimonial-item wow fadeInUp delay-0-4s">
                 <div class="author">
                   <img
-                    src="assets/images/testimonials/author2.jpg"
-                    alt="Author"
-                  />
-                </div>
-                <div class="text">
-                  Financial planners help people to knowledge in about how to
-                  invest and in save their moneye the most efficient way eve
-                  plan ners help people tioniio know ledige in about how.
-                </div>
-                <div class="testi-des">
-                  <h5>Liana Marie</h5>
-                  <span>Lead Designer Meta</span>
-                </div>
-              </SwiperSlide>
-              <!-- / END SINGLE TESTIMONIALS DESIGN AREA -->
-              <!-- START SINGLE TESTIMONIALS DESIGN AREA -->
-              <SwiperSlide class="testimonial-item wow fadeInUp delay-0-2s">
-                <div class="author">
-                  <img
                     src="assets/images/testimonials/author1.jpg"
                     alt="Author"
                   />
                 </div>
                 <div class="text">
-                  Financial planners help people to knowledge in about how to
-                  invest and in save their moneye the most efficient way eve
-                  plan ners help people tioniio know ledige in about how.
+                  Working with Bliss has been a really smooth experience. 
+                  He understands the creative direction quickly and knows how to bring 
+                  ideas to life in a clean, professional, and visually appealing way.
+                  From designs to website work, he pays attention to the little details 
+                  and always delivers with purpose. He is reliable, creative, and easy to 
+                  work with, and we truly appreciate the value he brings to every project.
                 </div>
                 <div class="testi-des">
-                  <h5>Zonathon Doe</h5>
-                  <span>CEO & Founder X</span>
-                </div>
-              </SwiperSlide>
-              <!-- / END SINGLE TESTIMONIALS DESIGN AREA -->
-              <!-- START SINGLE TESTIMONIALS DESIGN AREA -->
-              <SwiperSlide class="testimonial-item wow fadeInUp delay-0-4s">
-                <div class="author">
-                  <img
-                    src="assets/images/testimonials/author2.jpg"
-                    alt="Author"
-                  />
-                </div>
-                <div class="text">
-                  Financial planners help people to knowledge in about how to
-                  invest and in save their moneye the most efficient way eve
-                  plan ners help people tioniio know ledige in about how.
-                </div>
-                <div class="testi-des">
-                  <h5>Liana Marie</h5>
-                  <span>Lead Designer Meta</span>
+                  <h5>Abiola Clay</h5>
+                  <span>Executive Director, Clayheart Studios</span>
                 </div>
               </SwiperSlide>
               <!-- / END SINGLE TESTIMONIALS DESIGN AREA -->

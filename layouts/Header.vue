@@ -90,7 +90,7 @@ if (typeof window !== "undefined") {
             <!-- / END NAV DESIGN AREA -->
           </div>
           <div class="menu-btns">
-            <NuxtLink to="/contact" class="theme-btn contact-btn">Hire Me<i class="ri-shake-hands-line"></i></NuxtLink>
+            <NuxtLink to="https://wa.me/2348052641636" class="theme-btn contact-btn">Hire Me<i class="ri-shake-hands-line"></i></NuxtLink>
           </div>
         </div>
       </div>

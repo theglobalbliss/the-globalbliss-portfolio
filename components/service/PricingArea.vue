@@ -1,5 +1,5 @@
-
 <template>
+  <!--
   <section class="pricing-area">
     <div class="container">
       <div class="container-inner">
@@ -11,8 +11,8 @@
             </div>
           </div>
         </div>
+
         <div class="row justify-content-center">
-          <!-- START SINGLE PRICING DESIGN AREA -->
           <div class="col-lg-4 col-md-6">
             <div class="pricing-item wow fadeInUp delay-0-2s">
               <div class="pricing-header">
@@ -39,14 +39,13 @@
                     <i class="ri-arrow-right-line"></i>Custom Support
                   </li>
                 </ul>
-                <a href="#" class="theme-btn"
-                  >Order Now <i class="ri-shopping-basket-line"></i
-                ></a>
+                <a href="#" class="theme-btn">
+                  Order Now <i class="ri-shopping-basket-line"></i>
+                </a>
               </div>
             </div>
           </div>
-          <!-- / END SINGLE PRICING DESIGN AREA -->
-          <!-- START SINGLE PRICING DESIGN AREA -->
+
           <div class="col-lg-4 col-md-6">
             <div class="pricing-item wow fadeInUp delay-0-4s">
               <div class="pricing-header">
@@ -67,14 +66,13 @@
                     <i class="ri-arrow-right-line"></i>Custom Support
                   </li>
                 </ul>
-                <a href="#" class="theme-btn"
-                  >Order Now <i class="ri-shopping-basket-line"></i
-                ></a>
+                <a href="#" class="theme-btn">
+                  Order Now <i class="ri-shopping-basket-line"></i>
+                </a>
               </div>
             </div>
           </div>
-          <!-- / END SINGLE PRICING DESIGN AREA -->
-          <!-- START SINGLE PRICING DESIGN AREA -->
+
           <div class="col-lg-4 col-md-6">
             <div class="pricing-item wow fadeInUp delay-0-4s">
               <div class="pricing-header">
@@ -95,17 +93,16 @@
                     <i class="ri-arrow-right-line"></i>Custom Support
                   </li>
                 </ul>
-                <a href="#" class="theme-btn"
-                  >Order Now <i class="ri-shopping-basket-line"></i
-                ></a>
+                <a href="#" class="theme-btn">
+                  Order Now <i class="ri-shopping-basket-line"></i>
+                </a>
               </div>
             </div>
           </div>
-          <!-- / END SINGLE PRICING DESIGN AREA -->
         </div>
+
       </div>
     </div>
   </section>
+  -->
 </template>
-
- 

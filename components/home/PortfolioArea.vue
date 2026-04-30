@@ -63,7 +63,7 @@ const portfolio_data = [
     id: 8,
     img: portfolio_img_8,
     category: "Social Media Design",
-    title: "Clayheart Studios, NYC, UK.",
+    title: "Clayheart Studios, USA.",
   },
 ];
 

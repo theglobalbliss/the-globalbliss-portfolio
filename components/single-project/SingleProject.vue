@@ -23,7 +23,7 @@
             </div>
             <div class="single-info">
               <p>Client</p>
-              <h3>The GlobalBliss Brand</h3>
+              <h3>Third Lens Media</h3>
             </div>
             <div class="single-info">
               <p>Services</p>

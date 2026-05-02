@@ -1,4 +1,3 @@
-
 <template>
   <section class="call-to-action-area">
     <div class="container">
@@ -9,15 +8,22 @@
             <h2>
               Are You Ready to kickstart your project with a touch of bliss?
             </h2>
+
             <p>
               Reach out and {{"let's"}} make it happen ✨. {{"I'm"}} also available for
               full-time or Part-time opportunities to push the boundaries of
               design and deliver exceptional work.
             </p>
+
             <div class="hero-btns">
-              <NuxtLink to="wa.me/2348052641636" class="theme-btn"
-                >Let's Talk <i class="ri-download-line"></i
-              ></NuxtLink>
+              <a
+                href="https://wa.me/2348052641636"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="theme-btn"
+              >
+                Let's Talk <i class="ri-whatsapp-line"></i>
+              </a>
             </div>
           </div>
         </div>
@@ -26,5 +32,3 @@
     </div>
   </section>
 </template>
-
- 

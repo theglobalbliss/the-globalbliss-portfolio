@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.105.1",
     "bootstrap": "^5.3.3",
     "gsap": "^3.12.5",
     "nuxt": "^3.13.0",

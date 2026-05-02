@@ -12,6 +12,13 @@ export default defineNuxtConfig({
     "@/assets/css/responsive.css",
   ],
 
+  runtimeConfig: {
+    public: {
+      supabaseUrl: process.env.NUXT_PUBLIC_SUPABASE_URL,
+      supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY,
+    },
+  },
+
   nitro: {
     prerender: {
       crawlLinks: false,

@@ -1,101 +1,91 @@
 <script setup>
-import { ref } from 'vue';
-import ImagePopup from '~/components/common/ImagePopup.vue';
-import 'vue-easy-lightbox/external-css/vue-easy-lightbox.css';
-
-import portfolio_img_1 from "~/assets/images/projects/work1.jpg";
-import portfolio_img_2 from "~/assets/images/projects/work2.jpg";
-import portfolio_img_3 from "~/assets/images/projects/work3.jpg";
-import portfolio_img_4 from "~/assets/images/projects/work4.jpg";
-import portfolio_img_5 from "~/assets/images/projects/work5.jpg";
-import portfolio_img_6 from "~/assets/images/projects/work6.jpg";
-import portfolio_img_7 from "~/assets/images/projects/work7.jpg";
-import portfolio_img_8 from "~/assets/images/projects/work8.jpg";
+import { ref, computed, onMounted } from "vue";
+import { createClient } from "@supabase/supabase-js";
+import ImagePopup from "~/components/common/ImagePopup.vue";
+import "vue-easy-lightbox/external-css/vue-easy-lightbox.css";
 
 const props = defineProps({
   cls: String,
 });
 
-const portfolio_data = [
-  {
-    id: 1,
-    img: portfolio_img_1,
-    category: "Social Media Design",
-    title: "Media Force Creative Hub",
-  },
-  {
-    id: 2,
-    img: portfolio_img_2,
-    category: "Social Media Design",
-    title: "Christocentric Design",
-  },
-  {
-    id: 3,
-    img: portfolio_img_3,
-    category: "Website Development",
-    title: "Department of Human Nutrition and Dietetics, OAU, Ile-Ife",
-  },
-  {
-    id: 4,
-    img: portfolio_img_4,
-    category: "Website Development",
-    title: "Sacred Vessels Community",
-  },
-  {
-    id: 5,
-    img: portfolio_img_5,
-    category: "Brand Identity",
-    title: "Amicable FinServ",
-  },
-  {
-    id: 6,
-    img: portfolio_img_6,
-    category: "Website Development",
-    title: "Buildvalley Consulting",
-  },
-  {
-    id: 7,
-    img: portfolio_img_7,
-    category: "Website Development",
-    title: "Third Lens News Agency",
-  },
-  {
-    id: 8,
-    img: portfolio_img_8,
-    category: "Social Media Design",
-    title: "Clayheart Studios, USA.",
-  },
-];
+const config = useRuntimeConfig();
 
-const categories = [
-  "All",
-  ...new Set(portfolio_data.map((item) => item.category)),
-];
+const supabase = createClient(
+  config.public.supabaseUrl,
+  config.public.supabaseAnonKey
+);
 
+const portfolio_data = ref([]);
+const items = ref([]);
 const activeCategory = ref("All");
-const items = ref(portfolio_data);
+const image_popup = ref(null);
+const isLoading = ref(true);
+const errorMessage = ref("");
+
+const categories = computed(() => {
+  return [
+    "All",
+    ...new Set(portfolio_data.value.map((item) => item.category)),
+  ];
+});
+
+const fetchProjects = async () => {
+  isLoading.value = true;
+  errorMessage.value = "";
+
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("is_featured", true)
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    errorMessage.value = "Unable to load projects at the moment.";
+    isLoading.value = false;
+    return;
+  }
+
+  portfolio_data.value = data.map((project) => ({
+    id: project.id,
+    img: project.image_url,
+    category: project.category,
+    title: project.title,
+    description: project.description,
+    project_url: project.project_url,
+    client: project.client,
+    year: project.year,
+    service: project.service,
+  }));
+
+  items.value = portfolio_data.value;
+  isLoading.value = false;
+};
 
 const filterItems = (cateItem) => {
   activeCategory.value = cateItem;
 
   if (cateItem === "All") {
-    items.value = portfolio_data;
+    items.value = portfolio_data.value;
   } else {
-    items.value = portfolio_data.filter(
+    items.value = portfolio_data.value.filter(
       (item) => item.category === cateItem
     );
   }
 };
 
-const image_popup = ref(null);
-
 function handleImagePopup(item) {
-  const originalIndex = portfolio_data.findIndex(
+  const originalIndex = portfolio_data.value.findIndex(
     (project) => project.id === item.id
   );
 
-  image_popup.value.showImg(originalIndex);
+  if (image_popup.value && originalIndex !== -1) {
+    image_popup.value.showImg(originalIndex);
+  }
 }
+
+onMounted(() => {
+  fetchProjects();
+});
 </script>
 
 <template>
@@ -116,50 +106,60 @@ function handleImagePopup(item) {
             </div>
           </div>
 
-          <ul
-            class="project-filter filter-btns-one justify-content-left pb-15 wow fadeInUp delay-0-2s"
-          >
-            <li v-for="(item, i) in categories" :key="i">
-              <a
-                style="cursor: pointer"
-                @click="filterItems(item)"
-                :class="item === activeCategory ? 'current' : ''"
-              >
-                <span>{{ item }}</span>
-              </a>
-            </li>
-          </ul>
+          <div v-if="isLoading" class="text-center py-5">
+            <p>Loading projects...</p>
+          </div>
 
-          <div class="row project-masonry-active">
-            <div
-              v-for="item in items"
-              :key="item.id"
-              class="col-lg-4 col-md-6 item branding game"
+          <div v-else-if="errorMessage" class="text-center py-5">
+            <p>{{ errorMessage }}</p>
+          </div>
+
+          <template v-else>
+            <ul
+              class="project-filter filter-btns-one justify-content-left pb-15 wow fadeInUp delay-0-2s"
             >
-              <div class="project-item style-two wow fadeInUp delay-0-3s">
-                <div class="project-image">
-                  <img :src="item.img" :alt="item.title" />
+              <li v-for="(item, i) in categories" :key="i">
+                <a
+                  style="cursor: pointer"
+                  @click="filterItems(item)"
+                  :class="item === activeCategory ? 'current' : ''"
+                >
+                  <span>{{ item }}</span>
+                </a>
+              </li>
+            </ul>
 
-                  <a
-                    style="cursor: pointer"
-                    @click.prevent="handleImagePopup(item)"
-                    class="details-btn"
-                  >
-                    <i class="ri-arrow-right-up-line"></i>
-                  </a>
-                </div>
+            <div class="row project-masonry-active">
+              <div
+                v-for="item in items"
+                :key="item.id"
+                class="col-lg-4 col-md-6 item branding game"
+              >
+                <div class="project-item style-two wow fadeInUp delay-0-3s">
+                  <div class="project-image">
+                    <img :src="item.img" :alt="item.title" />
 
-                <div class="project-content">
-                  <span class="sub-title">{{ item.category }}</span>
-                  <h3>
-                    <NuxtLink to="/single-project">
-                      {{ item.title }}
-                    </NuxtLink>
-                  </h3>
+                    <a
+                      style="cursor: pointer"
+                      @click.prevent="handleImagePopup(item)"
+                      class="details-btn"
+                    >
+                      <i class="ri-arrow-right-up-line"></i>
+                    </a>
+                  </div>
+
+                  <div class="project-content">
+                    <span class="sub-title">{{ item.category }}</span>
+                    <h3>
+                      <NuxtLink to="/single-project">
+                        {{ item.title }}
+                      </NuxtLink>
+                    </h3>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </template>
         </div>
       </div>
     </section>

@@ -1,7 +1,5 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import ImagePopup from "~/components/common/ImagePopup.vue";
-import "vue-easy-lightbox/external-css/vue-easy-lightbox.css";
 
 const props = defineProps({
   cls: String,
@@ -10,7 +8,6 @@ const props = defineProps({
 const portfolioData = ref([]);
 const items = ref([]);
 const activeCategory = ref("All");
-const image_popup = ref(null);
 const isLoading = ref(true);
 const errorMessage = ref("");
 
@@ -36,6 +33,14 @@ const getProjectImage = (imageUrl) => {
   }
 
   return `/${imageUrl}`;
+};
+
+const getProjectLink = (item) => {
+  if (item.slug) {
+    return `/single-project/${item.slug}`;
+  }
+
+  return `/single-project?id=${item.id}`;
 };
 
 const fetchProjects = async () => {
@@ -86,28 +91,6 @@ const filterItems = (category) => {
   items.value = portfolioData.value.filter(
     (item) => item.category === category
   );
-};
-
-const handleImagePopup = (item) => {
-  const originalIndex = portfolioData.value.findIndex(
-    (project) => project.id === item.id
-  );
-
-  if (image_popup.value && originalIndex !== -1) {
-    image_popup.value.showImg(originalIndex);
-  }
-};
-
-const getProjectLink = (item) => {
-  if (item.project_url) return item.project_url;
-
-  if (item.slug) return `/single-project/${item.slug}`;
-
-  return "/single-project";
-};
-
-const isExternalLink = (url) => {
-  return url?.startsWith("http://") || url?.startsWith("https://");
 };
 
 onMounted(() => {
@@ -167,13 +150,13 @@ onMounted(() => {
                   <div class="project-image">
                     <img :src="item.img" :alt="item.title" />
 
-                    <a
-                      style="cursor: pointer"
-                      @click.prevent="handleImagePopup(item)"
+                    <NuxtLink
+                      :to="getProjectLink(item)"
                       class="details-btn"
+                      aria-label="View project"
                     >
                       <i class="ri-arrow-right-up-line"></i>
-                    </a>
+                    </NuxtLink>
                   </div>
 
                   <div class="project-content">
@@ -182,16 +165,7 @@ onMounted(() => {
                     </span>
 
                     <h3>
-                      <a
-                        v-if="isExternalLink(getProjectLink(item))"
-                        :href="getProjectLink(item)"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {{ item.title }}
-                      </a>
-
-                      <NuxtLink v-else :to="getProjectLink(item)">
+                      <NuxtLink :to="getProjectLink(item)">
                         {{ item.title }}
                       </NuxtLink>
                     </h3>
@@ -213,10 +187,5 @@ onMounted(() => {
         </div>
       </div>
     </section>
-
-    <ImagePopup
-      ref="image_popup"
-      :images="portfolioData.map((item) => item.img)"
-    />
   </div>
 </template>

@@ -1,12 +1,36 @@
 export default defineNuxtConfig({
   ssr: false,
 
+  modules: ["@vercel/analytics"],
+
   app: {
     head: {
+      htmlAttrs: {
+        lang: "en",
+      },
       meta: [
         {
-          name: "google-site-verification",
-          content: "rf1S2vaMm7vznu2YIG6xvGS4PtVIC8BnNr7DG7-UA44",
+          name: "viewport",
+          content: "width=device-width, initial-scale=1",
+        },
+        {
+          name: "theme-color",
+          content: "#0b0b0f",
+        },
+      ],
+      link: [
+        {
+          rel: "preconnect",
+          href: "https://fonts.googleapis.com",
+        },
+        {
+          rel: "preconnect",
+          href: "https://fonts.gstatic.com",
+          crossorigin: "",
+        },
+        {
+          rel: "dns-prefetch",
+          href: "https://theglobalbliss.online",
         },
       ],
     },
@@ -31,6 +55,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    compressPublicAssets: true,
     prerender: {
       crawlLinks: false,
       routes: [
@@ -45,6 +70,25 @@ export default defineNuxtConfig({
       ],
       failOnError: false,
     },
+  },
+
+  vite: {
+    build: {
+      cssCodeSplit: true,
+      chunkSizeWarningLimit: 1200,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ["vue"],
+            bootstrap: ["bootstrap"],
+          },
+        },
+      },
+    },
+  },
+
+  experimental: {
+    payloadExtraction: false,
   },
 
   compatibilityDate: "2026-04-27",

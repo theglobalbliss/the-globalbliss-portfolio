@@ -27,22 +27,29 @@ const fetchTestimonials = async () => {
   isLoading.value = true;
   errorMessage.value = "";
 
-  const supabase = useSupabase();
+  try {
+    const supabase = useSupabase();
 
-  const { data, error } = await supabase
-    .from("testimonials")
-    .select("*")
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true });
+    const { data, error } = await supabase
+      .from("testimonials")
+      .select(
+        "id, name, role, company, message, content, image_url, sort_order, is_active, updated_at"
+      )
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .limit(9);
 
-  if (error) {
+    if (error) {
+      throw error;
+    }
+
+    testimonials.value = data || [];
+  } catch (error) {
+    console.error("Testimonials error:", error.message);
     errorMessage.value = "Unable to load testimonials at the moment.";
+  } finally {
     isLoading.value = false;
-    return;
   }
-
-  testimonials.value = data || [];
-  isLoading.value = false;
 };
 
 onMounted(() => {
@@ -107,6 +114,8 @@ onMounted(() => {
                   <img
                     :src="getImageUrl(testimonial.image_url)"
                     :alt="testimonial.name || 'Client testimonial'"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
 

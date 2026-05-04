@@ -78,9 +78,10 @@ const fetchGalleryImages = async (projectId) => {
 
   const { data, error } = await supabase
     .from("project_gallery")
-    .select("*")
+    .select("id, image_url, sort_order, project_id")
     .eq("project_id", Number(projectId))
-    .order("sort_order", { ascending: true });
+    .order("sort_order", { ascending: true })
+    .limit(12);
 
   if (error) {
     console.error("Gallery error:", error.message);
@@ -95,161 +96,158 @@ const fetchProject = async () => {
   isLoading.value = true;
   errorMessage.value = "";
 
-  const projectId = route.query.id;
+  try {
+    const supabase = useSupabase();
 
-  if (!projectId) {
-    errorMessage.value = "Project not found.";
-    isLoading.value = false;
+    const projectId = route.query.id;
+    const projectSlug = route.params.slug;
+
+    let query = supabase
+      .from("projects")
+      .select(
+        "id, title, slug, category, description, image_url, project_url, client, year, service, created_at, updated_at, sort_order, is_featured"
+      );
+
+    if (projectSlug) {
+      query = query.eq("slug", projectSlug);
+    } else if (projectId) {
+      query = query.eq("id", Number(projectId));
+    } else {
+      throw new Error("Project not found.");
+    }
+
+    const { data, error } = await query.single();
+
+    if (error || !data) {
+      throw new Error("Project not found.");
+    }
+
+    project.value = data;
+
+    await fetchGalleryImages(data.id);
+
+    const seoTitle = `${data.title} | The GlobalBliss Brand Portfolio`;
+    const seoDescription = getSeoDescription(data);
+    const seoImage = getSeoImageUrl(data.image_url);
+    const canonicalUrl = data.slug
+      ? `${siteUrl}/single-project/${data.slug}`
+      : `${siteUrl}/single-project?id=${data.id}`;
 
     useHead({
-      title: "Project Not Found | The GlobalBliss Brand",
+      title: seoTitle,
       meta: [
         {
-          name: "robots",
-          content: "noindex, follow",
+          name: "description",
+          content: seoDescription,
         },
-      ],
-    });
-
-    return;
-  }
-
-  const supabase = useSupabase();
-
-  const { data, error } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("id", Number(projectId))
-    .single();
-
-  if (error || !data) {
-    errorMessage.value = "Project not found.";
-    isLoading.value = false;
-
-    useHead({
-      title: "Project Not Found | The GlobalBliss Brand",
-      meta: [
+        {
+          name: "keywords",
+          content: `${data.title}, ${data.category || "creative project"}, ${
+            data.service || "portfolio project"
+          }, The GlobalBliss Brand, Anuoluwapo Bliss, website design, brand identity design, creative design Nigeria`,
+        },
+        {
+          name: "author",
+          content: "Anuoluwapo Bliss",
+        },
         {
           name: "robots",
-          content: "noindex, follow",
+          content: "index, follow",
+        },
+        {
+          property: "og:title",
+          content: seoTitle,
+        },
+        {
+          property: "og:description",
+          content: seoDescription,
+        },
+        {
+          property: "og:url",
+          content: canonicalUrl,
+        },
+        {
+          property: "og:type",
+          content: "article",
+        },
+        {
+          property: "og:site_name",
+          content: "The GlobalBliss Brand",
+        },
+        {
+          property: "og:image",
+          content: seoImage,
+        },
+        {
+          name: "twitter:card",
+          content: "summary_large_image",
+        },
+        {
+          name: "twitter:title",
+          content: seoTitle,
+        },
+        {
+          name: "twitter:description",
+          content: seoDescription,
+        },
+        {
+          name: "twitter:image",
+          content: seoImage,
         },
       ],
-    });
-
-    return;
-  }
-
-  project.value = data;
-
-  await fetchGalleryImages(projectId);
-
-  const seoTitle = `${data.title} | The GlobalBliss Brand Portfolio`;
-  const seoDescription = getSeoDescription(data);
-  const seoImage = getSeoImageUrl(data.image_url);
-  const canonicalUrl = `${siteUrl}/single-project?id=${data.id}`;
-
-  useHead({
-    title: seoTitle,
-    meta: [
-      {
-        name: "description",
-        content: seoDescription,
-      },
-      {
-        name: "keywords",
-        content: `${data.title}, ${data.category || "creative project"}, ${
-          data.service || "portfolio project"
-        }, The GlobalBliss Brand, Anuoluwapo Bliss, website design, brand identity design, creative design Nigeria`,
-      },
-      {
-        name: "author",
-        content: "Anuoluwapo Bliss",
-      },
-      {
-        name: "robots",
-        content: "index, follow",
-      },
-      {
-        property: "og:title",
-        content: seoTitle,
-      },
-      {
-        property: "og:description",
-        content: seoDescription,
-      },
-      {
-        property: "og:url",
-        content: canonicalUrl,
-      },
-      {
-        property: "og:type",
-        content: "article",
-      },
-      {
-        property: "og:site_name",
-        content: "The GlobalBliss Brand",
-      },
-      {
-        property: "og:image",
-        content: seoImage,
-      },
-      {
-        name: "twitter:card",
-        content: "summary_large_image",
-      },
-      {
-        name: "twitter:title",
-        content: seoTitle,
-      },
-      {
-        name: "twitter:description",
-        content: seoDescription,
-      },
-      {
-        name: "twitter:image",
-        content: seoImage,
-      },
-    ],
-    link: [
-      {
-        rel: "canonical",
-        href: canonicalUrl,
-      },
-    ],
-    script: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "CreativeWork",
-          name: data.title,
-          description: seoDescription,
-          image: seoImage,
-          url: canonicalUrl,
-          creator: {
-            "@type": "Person",
-            name: "Anuoluwapo Bliss",
-            url: siteUrl,
-          },
-          publisher: {
-            "@type": "Organization",
-            name: "The GlobalBliss Brand",
-            url: siteUrl,
-            logo: {
-              "@type": "ImageObject",
-              url: `${siteUrl}/og-image.jpg`,
+      link: [
+        {
+          rel: "canonical",
+          href: canonicalUrl,
+        },
+      ],
+      script: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CreativeWork",
+            name: data.title,
+            description: seoDescription,
+            image: seoImage,
+            url: canonicalUrl,
+            creator: {
+              "@type": "Person",
+              name: "Anuoluwapo Bliss",
+              url: siteUrl,
             },
-          },
-          dateCreated: data.created_at || "",
-          dateModified: data.updated_at || data.created_at || "",
-          genre: data.category || "Creative Project",
-          about: data.service || data.category || "Creative Design",
-        }),
-      },
-    ],
-  });
+            publisher: {
+              "@type": "Organization",
+              name: "The GlobalBliss Brand",
+              url: siteUrl,
+              logo: {
+                "@type": "ImageObject",
+                url: `${siteUrl}/og-image.jpg`,
+              },
+            },
+            dateCreated: data.created_at || "",
+            dateModified: data.updated_at || data.created_at || "",
+            genre: data.category || "Creative Project",
+            about: data.service || data.category || "Creative Design",
+          }),
+        },
+      ],
+    });
+  } catch (error) {
+    errorMessage.value = error.message || "Project not found.";
 
-  isLoading.value = false;
+    useHead({
+      title: "Project Not Found | The GlobalBliss Brand",
+      meta: [
+        {
+          name: "robots",
+          content: "noindex, follow",
+        },
+      ],
+    });
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 onMounted(async () => {
@@ -294,6 +292,8 @@ onMounted(async () => {
           <img
             :src="getDisplayImageUrl(project.image_url)"
             :alt="project.title"
+            fetchpriority="high"
+            decoding="async"
           />
         </div>
 
@@ -371,6 +371,8 @@ onMounted(async () => {
                       <img
                         :src="getDisplayImageUrl(image.image_url)"
                         :alt="project.title"
+                        loading="lazy"
+                        decoding="async"
                       />
 
                       <span class="single-gallery-view">

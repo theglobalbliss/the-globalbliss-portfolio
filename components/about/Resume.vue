@@ -86,23 +86,30 @@ const fetchResumeItems = async () => {
   isLoading.value = true;
   errorMessage.value = "";
 
-  const supabase = useSupabase();
+  try {
+    const supabase = useSupabase();
 
-  const { data, error } = await supabase
-    .from("resume_items")
-    .select("*")
-    .eq("is_active", true)
-    .order("sort_order", { ascending: true });
+    const { data, error } = await supabase
+      .from("resume_items")
+      .select(
+        "id, item_type, years, title, institution, description, icon, sort_order, is_active, updated_at"
+      )
+      .eq("is_active", true)
+      .order("sort_order", { ascending: true })
+      .limit(12);
 
-  if (error) {
+    if (error) {
+      throw error;
+    }
+
+    resumeItems.value = data?.length ? data : fallbackItems;
+  } catch (error) {
     console.error("Resume items error:", error.message);
+    errorMessage.value = "Unable to load resume items.";
     resumeItems.value = fallbackItems;
+  } finally {
     isLoading.value = false;
-    return;
   }
-
-  resumeItems.value = data?.length ? data : fallbackItems;
-  isLoading.value = false;
 };
 
 onMounted(() => {
@@ -183,6 +190,10 @@ onMounted(() => {
             </div>
           </div>
         </div>
+
+        <p v-if="errorMessage" class="text-muted text-center mt-4 mb-0">
+          Showing default resume content because live content could not load.
+        </p>
       </div>
     </div>
   </section>

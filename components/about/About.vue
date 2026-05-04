@@ -38,39 +38,43 @@ const getImageUrl = (imageUrl) => {
 const fetchAboutContent = async () => {
   isLoading.value = true;
 
-  const supabase = useSupabase();
+  try {
+    const supabase = useSupabase();
 
-  const { data, error } = await supabase
-    .from("about_content")
-    .select("*")
-    .eq("section_key", "main")
-    .single();
+    const { data, error } = await supabase
+      .from("about_content")
+      .select(
+        "id, section_key, eyebrow, title, description, description_two, description_three, profile_image_url, name, role, availability_text, updated_at"
+      )
+      .eq("section_key", "main")
+      .single();
 
-  if (error) {
+    if (error) {
+      throw error;
+    }
+
+    if (data) {
+      aboutContent.value = {
+        eyebrow: data.eyebrow || aboutContent.value.eyebrow,
+        title: data.title || aboutContent.value.title,
+        description: data.description || aboutContent.value.description,
+        description_two:
+          data.description_two || aboutContent.value.description_two,
+        description_three:
+          data.description_three || aboutContent.value.description_three,
+        profile_image_url:
+          data.profile_image_url || aboutContent.value.profile_image_url,
+        name: data.name || aboutContent.value.name,
+        role: data.role || aboutContent.value.role,
+        availability_text:
+          data.availability_text || aboutContent.value.availability_text,
+      };
+    }
+  } catch (error) {
     console.error("About content error:", error.message);
+  } finally {
     isLoading.value = false;
-    return;
   }
-
-  if (data) {
-    aboutContent.value = {
-      eyebrow: data.eyebrow || aboutContent.value.eyebrow,
-      title: data.title || aboutContent.value.title,
-      description: data.description || aboutContent.value.description,
-      description_two:
-        data.description_two || aboutContent.value.description_two,
-      description_three:
-        data.description_three || aboutContent.value.description_three,
-      profile_image_url:
-        data.profile_image_url || aboutContent.value.profile_image_url,
-      name: data.name || aboutContent.value.name,
-      role: data.role || aboutContent.value.role,
-      availability_text:
-        data.availability_text || aboutContent.value.availability_text,
-    };
-  }
-
-  isLoading.value = false;
 };
 
 onMounted(() => {
@@ -91,6 +95,8 @@ onMounted(() => {
             <img
               :src="getImageUrl(aboutContent.profile_image_url)"
               :alt="aboutContent.name"
+              fetchpriority="high"
+              decoding="async"
             />
 
             <h2>{{ aboutContent.name }}</h2>

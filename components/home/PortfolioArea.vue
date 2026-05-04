@@ -47,37 +47,44 @@ const fetchProjects = async () => {
   isLoading.value = true;
   errorMessage.value = "";
 
-  const supabase = useSupabase();
+  try {
+    const supabase = useSupabase();
 
-  const { data, error } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("is_featured", true)
-    .order("sort_order", { ascending: true });
+    const { data, error } = await supabase
+      .from("projects")
+      .select(
+        "id, title, slug, category, description, image_url, project_url, client, year, service, is_featured, sort_order"
+      )
+      .eq("is_featured", true)
+      .order("sort_order", { ascending: true })
+      .limit(6);
 
-  if (error) {
+    if (error) {
+      throw error;
+    }
+
+    portfolioData.value = (data || []).map((project) => ({
+      id: project.id,
+      img: getProjectImage(project.image_url),
+      category: project.category || "Project",
+      title: project.title || "Untitled Project",
+      description: project.description || "",
+      project_url: project.project_url || "",
+      client: project.client || "",
+      year: project.year || "",
+      service: project.service || project.category || "",
+      slug: project.slug || "",
+      is_featured: project.is_featured,
+      sort_order: project.sort_order,
+    }));
+
+    items.value = portfolioData.value;
+  } catch (error) {
+    console.error("Error loading projects:", error.message);
     errorMessage.value = "Unable to load projects at the moment.";
+  } finally {
     isLoading.value = false;
-    return;
   }
-
-  portfolioData.value = (data || []).map((project) => ({
-    id: project.id,
-    img: getProjectImage(project.image_url),
-    category: project.category || "Project",
-    title: project.title || "Untitled Project",
-    description: project.description || "",
-    project_url: project.project_url || "",
-    client: project.client || "",
-    year: project.year || "",
-    service: project.service || project.category || "",
-    slug: project.slug || "",
-    is_featured: project.is_featured,
-    sort_order: project.sort_order,
-  }));
-
-  items.value = portfolioData.value;
-  isLoading.value = false;
 };
 
 const filterItems = (category) => {
@@ -148,7 +155,12 @@ onMounted(() => {
               >
                 <div class="project-item style-two wow fadeInUp delay-0-3s">
                   <div class="project-image">
-                    <img :src="item.img" :alt="item.title" />
+                    <img
+                      :src="item.img"
+                      :alt="item.title"
+                      loading="lazy"
+                      decoding="async"
+                    />
 
                     <NuxtLink
                       :to="getProjectLink(item)"

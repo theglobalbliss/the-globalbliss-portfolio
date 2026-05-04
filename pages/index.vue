@@ -6,6 +6,10 @@ useHead({
   title: "The GlobalBliss Brand | Creative Designer & Website Developer in Nigeria",
   meta: [
     {
+      name: "google-site-verification",
+      content: "rf1S2vaMm7vznu2YIG6xvGS4PtVIC8BnNr7DG7-UA44",
+    },
+    {
       name: "description",
       content:
         "Explore The GlobalBliss Brand portfolio by Anuoluwapo Bliss, a creative designer, website developer, brand identity designer, and digital strategist based in Nigeria.",

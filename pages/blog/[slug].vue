@@ -9,8 +9,23 @@ const isLoading = ref(true);
 const errorMessage = ref("");
 
 const fallbackImage = "/images/projects/work1.jpg";
+const siteUrl = "https://theglobalbliss.online";
 
 const getImageUrl = (imageUrl) => {
+  if (!imageUrl) return `${siteUrl}/og-image.jpg`;
+
+  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+    return imageUrl;
+  }
+
+  if (imageUrl.startsWith("/")) {
+    return `${siteUrl}${imageUrl}`;
+  }
+
+  return `${siteUrl}/${imageUrl}`;
+};
+
+const getDisplayImageUrl = (imageUrl) => {
   if (!imageUrl) return fallbackImage;
 
   if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
@@ -34,6 +49,28 @@ const formatDate = (date) => {
   });
 };
 
+const stripHtml = (text) => {
+  if (!text) return "";
+
+  return text
+    .replace(/<[^>]*>?/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+const getSeoDescription = (data) => {
+  const description =
+    data.excerpt ||
+    data.description ||
+    stripHtml(data.content) ||
+    stripHtml(data.body) ||
+    "Read insights on design, branding, websites, creativity, and digital strategy from The GlobalBliss Brand.";
+
+  return description.length > 160
+    ? `${description.substring(0, 157)}...`
+    : description;
+};
+
 const fetchPost = async () => {
   isLoading.value = true;
   errorMessage.value = "";
@@ -45,35 +82,140 @@ const fetchPost = async () => {
   if (!data) {
     errorMessage.value = "Blog post not found.";
     isLoading.value = false;
+
+    useHead({
+      title: "Blog Post Not Found | The GlobalBliss Brand",
+      meta: [
+        {
+          name: "robots",
+          content: "noindex, follow",
+        },
+      ],
+    });
+
     return;
   }
 
   post.value = data;
 
+  const seoTitle = `${data.title} | The GlobalBliss Brand`;
+  const seoDescription = getSeoDescription(data);
+  const seoImage = getImageUrl(data.image_url);
+  const canonicalUrl = `${siteUrl}/blog/${data.slug || route.params.slug}`;
+
   useHead({
-    title: `${data.title} - The GlobalBliss Brand`,
+    title: seoTitle,
     meta: [
       {
         name: "description",
+        content: seoDescription,
+      },
+      {
+        name: "keywords",
         content:
-          data.excerpt ||
-          data.description ||
-          "Read from The GlobalBliss Brand blog.",
+          data.keywords ||
+          `${data.title}, The GlobalBliss Brand, Anuoluwapo Bliss, design blog, branding, website design, creative strategy`,
+      },
+      {
+        name: "author",
+        content: "Anuoluwapo Bliss",
+      },
+      {
+        name: "robots",
+        content: "index, follow",
       },
       {
         property: "og:title",
-        content: `${data.title} - The GlobalBliss Brand`,
+        content: seoTitle,
       },
       {
         property: "og:description",
-        content:
-          data.excerpt ||
-          data.description ||
-          "Read from The GlobalBliss Brand blog.",
+        content: seoDescription,
+      },
+      {
+        property: "og:url",
+        content: canonicalUrl,
+      },
+      {
+        property: "og:type",
+        content: "article",
+      },
+      {
+        property: "og:site_name",
+        content: "The GlobalBliss Brand",
       },
       {
         property: "og:image",
-        content: getImageUrl(data.image_url),
+        content: seoImage,
+      },
+      {
+        property: "article:author",
+        content: "Anuoluwapo Bliss",
+      },
+      {
+        property: "article:published_time",
+        content: data.created_at || "",
+      },
+      {
+        property: "article:modified_time",
+        content: data.updated_at || data.created_at || "",
+      },
+      {
+        property: "article:section",
+        content: data.category || "Brand Story",
+      },
+      {
+        name: "twitter:card",
+        content: "summary_large_image",
+      },
+      {
+        name: "twitter:title",
+        content: seoTitle,
+      },
+      {
+        name: "twitter:description",
+        content: seoDescription,
+      },
+      {
+        name: "twitter:image",
+        content: seoImage,
+      },
+    ],
+    link: [
+      {
+        rel: "canonical",
+        href: canonicalUrl,
+      },
+    ],
+    script: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: data.title,
+          description: seoDescription,
+          image: seoImage,
+          datePublished: data.created_at || "",
+          dateModified: data.updated_at || data.created_at || "",
+          author: {
+            "@type": "Person",
+            name: "Anuoluwapo Bliss",
+            url: siteUrl,
+          },
+          publisher: {
+            "@type": "Organization",
+            name: "The GlobalBliss Brand",
+            logo: {
+              "@type": "ImageObject",
+              url: `${siteUrl}/og-image.jpg`,
+            },
+          },
+          mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": canonicalUrl,
+          },
+        }),
       },
     ],
   });
@@ -91,7 +233,6 @@ onMounted(async () => {
 
 <template>
   <div>
-
     <CommonScrollTop />
     <Header />
 
@@ -118,7 +259,7 @@ onMounted(async () => {
 
             <div class="gb-single-blog-hero wow fadeInUp delay-0-2s">
               <img
-                :src="getImageUrl(post.image_url)"
+                :src="getDisplayImageUrl(post.image_url)"
                 :alt="post.title"
               />
             </div>

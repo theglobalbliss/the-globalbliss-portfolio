@@ -3,7 +3,75 @@ import Footer from "~/layouts/Footer.vue";
 import Header from "~/layouts/Header.vue";
 
 useHead({
-  title: "Blog - The GlobalBliss Brand",
+  title: "Blog | Design, Branding & Website Insights by The GlobalBliss Brand",
+  meta: [
+    {
+      name: "description",
+      content:
+        "Read thoughts, stories, updates, and insights from The GlobalBliss Brand on design, branding, website development, creativity, and digital strategy.",
+    },
+    {
+      name: "keywords",
+      content:
+        "GlobalBliss blog, Anuoluwapo Bliss blog, design blog Nigeria, branding insights, website design tips, creative designer blog, digital strategy Nigeria",
+    },
+    {
+      name: "author",
+      content: "Anuoluwapo Bliss",
+    },
+    {
+      name: "robots",
+      content: "index, follow",
+    },
+    {
+      property: "og:title",
+      content: "Blog | Design, Branding & Website Insights by The GlobalBliss Brand",
+    },
+    {
+      property: "og:description",
+      content:
+        "Explore design stories, website insights, branding thoughts, and creative updates from Anuoluwapo Bliss.",
+    },
+    {
+      property: "og:url",
+      content: "https://theglobalbliss.online/blog",
+    },
+    {
+      property: "og:type",
+      content: "website",
+    },
+    {
+      property: "og:site_name",
+      content: "The GlobalBliss Brand",
+    },
+    {
+      property: "og:image",
+      content: "https://theglobalbliss.online/og-image.jpg",
+    },
+    {
+      name: "twitter:card",
+      content: "summary_large_image",
+    },
+    {
+      name: "twitter:title",
+      content: "Blog | The GlobalBliss Brand",
+    },
+    {
+      name: "twitter:description",
+      content:
+        "Read design, branding, website development, and digital strategy insights from The GlobalBliss Brand.",
+    },
+    {
+      name: "twitter:image",
+      content: "https://theglobalbliss.online/og-image.jpg",
+    },
+  ],
+  link: [
+    {
+      rel: "canonical",
+      href: "https://theglobalbliss.online/blog",
+    },
+  ],
 });
 
 const posts = ref([]);

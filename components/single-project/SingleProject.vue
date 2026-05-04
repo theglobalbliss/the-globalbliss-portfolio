@@ -78,7 +78,7 @@ const fetchGalleryImages = async (projectId) => {
 
   const { data, error } = await supabase
     .from("project_gallery")
-    .select("id, image_url, sort_order, project_id")
+    .select("id, project_id, image_url, sort_order")
     .eq("project_id", Number(projectId))
     .order("sort_order", { ascending: true })
     .limit(12);
@@ -105,7 +105,7 @@ const fetchProject = async () => {
     let query = supabase
       .from("projects")
       .select(
-        "id, title, slug, category, description, image_url, project_url, client, year, service, created_at, updated_at, sort_order, is_featured"
+        "id, title, slug, category, description, image_url, created_at, updated_at, sort_order, is_featured"
       );
 
     if (projectSlug) {
@@ -129,6 +129,7 @@ const fetchProject = async () => {
     const seoTitle = `${data.title} | The GlobalBliss Brand Portfolio`;
     const seoDescription = getSeoDescription(data);
     const seoImage = getSeoImageUrl(data.image_url);
+
     const canonicalUrl = data.slug
       ? `${siteUrl}/single-project/${data.slug}`
       : `${siteUrl}/single-project?id=${data.id}`;
@@ -142,9 +143,7 @@ const fetchProject = async () => {
         },
         {
           name: "keywords",
-          content: `${data.title}, ${data.category || "creative project"}, ${
-            data.service || "portfolio project"
-          }, The GlobalBliss Brand, Anuoluwapo Bliss, website design, brand identity design, creative design Nigeria`,
+          content: `${data.title}, ${data.category || "creative project"}, The GlobalBliss Brand, Anuoluwapo Bliss, website design, brand identity design, creative design Nigeria`,
         },
         {
           name: "author",
@@ -228,12 +227,14 @@ const fetchProject = async () => {
             dateCreated: data.created_at || "",
             dateModified: data.updated_at || data.created_at || "",
             genre: data.category || "Creative Project",
-            about: data.service || data.category || "Creative Design",
+            about: data.category || "Creative Design",
           }),
         },
       ],
     });
   } catch (error) {
+    console.error("Project error:", error.message);
+
     errorMessage.value = error.message || "Project not found.";
 
     useHead({
@@ -303,38 +304,24 @@ onMounted(async () => {
               <div class="single-project-page-left wow fadeInUp delay-0-2s">
                 <div class="single-info">
                   <p>Year</p>
-                  <h3>{{ project.year || "Not specified" }}</h3>
+                  <h3>Not specified</h3>
                 </div>
 
                 <div class="single-info">
                   <p>Client</p>
-                  <h3>{{ project.client || "The GlobalBliss Brand" }}</h3>
+                  <h3>The GlobalBliss Brand</h3>
                 </div>
 
                 <div class="single-info">
                   <p>Services</p>
                   <h3>
-                    {{ project.service || project.category || "Creative Design" }}
+                    {{ project.category || "Creative Design" }}
                   </h3>
                 </div>
 
                 <div class="single-info">
                   <p>Project</p>
                   <h3>{{ project.category || "Creative" }}</h3>
-                </div>
-
-                <div v-if="project.project_url" class="single-info">
-                  <p>Live Link</p>
-
-                  <a
-                    :href="project.project_url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="theme-btn mt-2"
-                  >
-                    Visit Project
-                    <i class="ri-arrow-right-up-line"></i>
-                  </a>
                 </div>
               </div>
             </div>

@@ -75,152 +75,157 @@ const fetchPost = async () => {
   isLoading.value = true;
   errorMessage.value = "";
 
-  const { getBlogPostBySlug } = useBlogPosts();
+  try {
+    const { getBlogPostBySlug } = useBlogPosts();
 
-  const data = await getBlogPostBySlug(route.params.slug);
+    const data = await getBlogPostBySlug(route.params.slug);
 
-  if (!data) {
-    errorMessage.value = "Blog post not found.";
-    isLoading.value = false;
+    if (!data) {
+      errorMessage.value = "Blog post not found.";
+      isLoading.value = false;
+
+      useHead({
+        title: "Blog Post Not Found | The GlobalBliss Brand",
+        meta: [
+          {
+            name: "robots",
+            content: "noindex, follow",
+          },
+        ],
+      });
+
+      return;
+    }
+
+    post.value = data;
+
+    const seoTitle = `${data.title} | The GlobalBliss Brand`;
+    const seoDescription = getSeoDescription(data);
+    const seoImage = getImageUrl(data.image_url);
+    const canonicalUrl = `${siteUrl}/blog/${data.slug || route.params.slug}`;
 
     useHead({
-      title: "Blog Post Not Found | The GlobalBliss Brand",
+      title: seoTitle,
       meta: [
         {
+          name: "description",
+          content: seoDescription,
+        },
+        {
+          name: "keywords",
+          content:
+            data.keywords ||
+            `${data.title}, The GlobalBliss Brand, Anuoluwapo Bliss, design blog, branding, website design, creative strategy`,
+        },
+        {
+          name: "author",
+          content: data.author || "Anuoluwapo Bliss",
+        },
+        {
           name: "robots",
-          content: "noindex, follow",
+          content: "index, follow",
+        },
+        {
+          property: "og:title",
+          content: seoTitle,
+        },
+        {
+          property: "og:description",
+          content: seoDescription,
+        },
+        {
+          property: "og:url",
+          content: canonicalUrl,
+        },
+        {
+          property: "og:type",
+          content: "article",
+        },
+        {
+          property: "og:site_name",
+          content: "The GlobalBliss Brand",
+        },
+        {
+          property: "og:image",
+          content: seoImage,
+        },
+        {
+          property: "article:author",
+          content: data.author || "Anuoluwapo Bliss",
+        },
+        {
+          property: "article:published_time",
+          content: data.created_at || "",
+        },
+        {
+          property: "article:modified_time",
+          content: data.updated_at || data.created_at || "",
+        },
+        {
+          property: "article:section",
+          content: data.category || "Brand Story",
+        },
+        {
+          name: "twitter:card",
+          content: "summary_large_image",
+        },
+        {
+          name: "twitter:title",
+          content: seoTitle,
+        },
+        {
+          name: "twitter:description",
+          content: seoDescription,
+        },
+        {
+          name: "twitter:image",
+          content: seoImage,
+        },
+      ],
+      link: [
+        {
+          rel: "canonical",
+          href: canonicalUrl,
+        },
+      ],
+      script: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: data.title,
+            description: seoDescription,
+            image: seoImage,
+            datePublished: data.created_at || "",
+            dateModified: data.updated_at || data.created_at || "",
+            author: {
+              "@type": "Person",
+              name: data.author || "Anuoluwapo Bliss",
+              url: siteUrl,
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "The GlobalBliss Brand",
+              logo: {
+                "@type": "ImageObject",
+                url: `${siteUrl}/og-image.jpg`,
+              },
+            },
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": canonicalUrl,
+            },
+          }),
         },
       ],
     });
 
-    return;
+    isLoading.value = false;
+  } catch (error) {
+    errorMessage.value = "Unable to load blog post at the moment.";
+    isLoading.value = false;
   }
-
-  post.value = data;
-
-  const seoTitle = `${data.title} | The GlobalBliss Brand`;
-  const seoDescription = getSeoDescription(data);
-  const seoImage = getImageUrl(data.image_url);
-  const canonicalUrl = `${siteUrl}/blog/${data.slug || route.params.slug}`;
-
-  useHead({
-    title: seoTitle,
-    meta: [
-      {
-        name: "description",
-        content: seoDescription,
-      },
-      {
-        name: "keywords",
-        content:
-          data.keywords ||
-          `${data.title}, The GlobalBliss Brand, Anuoluwapo Bliss, design blog, branding, website design, creative strategy`,
-      },
-      {
-        name: "author",
-        content: "Anuoluwapo Bliss",
-      },
-      {
-        name: "robots",
-        content: "index, follow",
-      },
-      {
-        property: "og:title",
-        content: seoTitle,
-      },
-      {
-        property: "og:description",
-        content: seoDescription,
-      },
-      {
-        property: "og:url",
-        content: canonicalUrl,
-      },
-      {
-        property: "og:type",
-        content: "article",
-      },
-      {
-        property: "og:site_name",
-        content: "The GlobalBliss Brand",
-      },
-      {
-        property: "og:image",
-        content: seoImage,
-      },
-      {
-        property: "article:author",
-        content: "Anuoluwapo Bliss",
-      },
-      {
-        property: "article:published_time",
-        content: data.created_at || "",
-      },
-      {
-        property: "article:modified_time",
-        content: data.updated_at || data.created_at || "",
-      },
-      {
-        property: "article:section",
-        content: data.category || "Brand Story",
-      },
-      {
-        name: "twitter:card",
-        content: "summary_large_image",
-      },
-      {
-        name: "twitter:title",
-        content: seoTitle,
-      },
-      {
-        name: "twitter:description",
-        content: seoDescription,
-      },
-      {
-        name: "twitter:image",
-        content: seoImage,
-      },
-    ],
-    link: [
-      {
-        rel: "canonical",
-        href: canonicalUrl,
-      },
-    ],
-    script: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "BlogPosting",
-          headline: data.title,
-          description: seoDescription,
-          image: seoImage,
-          datePublished: data.created_at || "",
-          dateModified: data.updated_at || data.created_at || "",
-          author: {
-            "@type": "Person",
-            name: "Anuoluwapo Bliss",
-            url: siteUrl,
-          },
-          publisher: {
-            "@type": "Organization",
-            name: "The GlobalBliss Brand",
-            logo: {
-              "@type": "ImageObject",
-              url: `${siteUrl}/og-image.jpg`,
-            },
-          },
-          mainEntityOfPage: {
-            "@type": "WebPage",
-            "@id": canonicalUrl,
-          },
-        }),
-      },
-    ],
-  });
-
-  isLoading.value = false;
 };
 
 onMounted(async () => {
@@ -261,6 +266,8 @@ onMounted(async () => {
               <img
                 :src="getDisplayImageUrl(post.image_url)"
                 :alt="post.title"
+                loading="lazy"
+                decoding="async"
               />
             </div>
 
@@ -281,11 +288,10 @@ onMounted(async () => {
                 {{ post.excerpt || post.description }}
               </p>
 
-              <div class="gb-single-blog-body">
-                <p style="white-space: pre-line;">
-                  {{ post.content || post.body || post.description }}
-                </p>
-              </div>
+              <div
+                class="gb-single-blog-body-content"
+                v-html="post.content || post.body || post.description"
+              ></div>
 
               <div class="gb-single-blog-footer">
                 <NuxtLink to="/blog" class="theme-btn">

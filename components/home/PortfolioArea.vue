@@ -36,10 +36,6 @@ const getProjectImage = (imageUrl) => {
 };
 
 const getProjectLink = (item) => {
-  if (item.slug) {
-    return `/single-project/${item.slug}`;
-  }
-
   return `/single-project?id=${item.id}`;
 };
 
@@ -53,7 +49,7 @@ const fetchProjects = async () => {
     const { data, error } = await supabase
       .from("projects")
       .select(
-        "id, title, slug, category, description, image_url, is_featured, sort_order"
+        "id, title, category, description, image_url, is_featured, sort_order"
       )
       .eq("is_featured", true)
       .order("sort_order", { ascending: true })
@@ -69,11 +65,6 @@ const fetchProjects = async () => {
       category: project.category || "Project",
       title: project.title || "Untitled Project",
       description: project.description || "",
-      project_url: "",
-      client: "",
-      year: "",
-      service: project.category || "",
-      slug: project.slug || "",
       is_featured: project.is_featured,
       sort_order: project.sort_order,
     }));
@@ -181,12 +172,6 @@ onMounted(() => {
                         {{ item.title }}
                       </NuxtLink>
                     </h3>
-
-                    <p v-if="item.client || item.year" class="project-meta">
-                      <span v-if="item.client">{{ item.client }}</span>
-                      <span v-if="item.client && item.year"> · </span>
-                      <span v-if="item.year">{{ item.year }}</span>
-                    </p>
                   </div>
                 </div>
               </div>

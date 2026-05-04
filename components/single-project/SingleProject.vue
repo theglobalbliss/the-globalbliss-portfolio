@@ -79,7 +79,7 @@ const fetchGalleryImages = async (projectId) => {
   const { data, error } = await supabase
     .from("project_gallery")
     .select("id, project_id, image_url, sort_order")
-    .eq("project_id", Number(projectId))
+    .eq("project_id", projectId)
     .order("sort_order", { ascending: true })
     .limit(12);
 
@@ -100,25 +100,21 @@ const fetchProject = async () => {
     const supabase = useSupabase();
 
     const projectId = route.query.id;
-    const projectSlug = route.params.slug;
 
-    let query = supabase
-      .from("projects")
-      .select(
-        "id, title, slug, category, description, image_url, created_at, updated_at, sort_order, is_featured"
-      );
-
-    if (projectSlug) {
-      query = query.eq("slug", projectSlug);
-    } else if (projectId) {
-      query = query.eq("id", Number(projectId));
-    } else {
+    if (!projectId) {
       throw new Error("Project not found.");
     }
 
-    const { data, error } = await query.single();
+    const { data, error } = await supabase
+      .from("projects")
+      .select(
+        "id, title, category, description, image_url, created_at, updated_at, sort_order, is_featured"
+      )
+      .eq("id", projectId)
+      .single();
 
     if (error || !data) {
+      console.error("Project fetch error:", error?.message);
       throw new Error("Project not found.");
     }
 
@@ -129,10 +125,7 @@ const fetchProject = async () => {
     const seoTitle = `${data.title} | The GlobalBliss Brand Portfolio`;
     const seoDescription = getSeoDescription(data);
     const seoImage = getSeoImageUrl(data.image_url);
-
-    const canonicalUrl = data.slug
-      ? `${siteUrl}/single-project/${data.slug}`
-      : `${siteUrl}/single-project?id=${data.id}`;
+    const canonicalUrl = `${siteUrl}/single-project?id=${data.id}`;
 
     useHead({
       title: seoTitle,

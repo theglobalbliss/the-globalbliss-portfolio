@@ -1,40 +1,7 @@
 export default defineNuxtConfig({
   ssr: false,
 
-  modules: ["@vercel/analytics"],
-
-  app: {
-    head: {
-      htmlAttrs: {
-        lang: "en",
-      },
-      meta: [
-        {
-          name: "viewport",
-          content: "width=device-width, initial-scale=1",
-        },
-        {
-          name: "theme-color",
-          content: "#0b0b0f",
-        },
-      ],
-      link: [
-        {
-          rel: "preconnect",
-          href: "https://fonts.googleapis.com",
-        },
-        {
-          rel: "preconnect",
-          href: "https://fonts.gstatic.com",
-          crossorigin: "",
-        },
-        {
-          rel: "dns-prefetch",
-          href: "https://theglobalbliss.online",
-        },
-      ],
-    },
-  },
+  modules: ["@vercel/analytics/nuxt"],
 
   css: [
     "swiper/css/bundle",
@@ -69,21 +36,6 @@ export default defineNuxtConfig({
         "/sitemap.xml",
       ],
       failOnError: false,
-    },
-  },
-
-  vite: {
-    build: {
-      cssCodeSplit: true,
-      chunkSizeWarningLimit: 1200,
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            vendor: ["vue"],
-            bootstrap: ["bootstrap"],
-          },
-        },
-      },
     },
   },
 

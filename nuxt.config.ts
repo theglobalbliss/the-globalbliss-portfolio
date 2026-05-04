@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   ssr: false,
 
-  modules: ["@vercel/analytics/nuxt/module"],
+  modules: ["@vercel/analytics"],
 
   css: [
     "swiper/css/bundle",

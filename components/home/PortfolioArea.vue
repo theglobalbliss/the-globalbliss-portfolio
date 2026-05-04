@@ -1,6 +1,5 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { createClient } from "@supabase/supabase-js";
 import ImagePopup from "~/components/common/ImagePopup.vue";
 import "vue-easy-lightbox/external-css/vue-easy-lightbox.css";
 
@@ -8,30 +7,42 @@ const props = defineProps({
   cls: String,
 });
 
-const config = useRuntimeConfig();
-
-const supabase = createClient(
-  config.public.supabaseUrl,
-  config.public.supabaseAnonKey
-);
-
-const portfolio_data = ref([]);
+const portfolioData = ref([]);
 const items = ref([]);
 const activeCategory = ref("All");
 const image_popup = ref(null);
 const isLoading = ref(true);
 const errorMessage = ref("");
 
+const fallbackImage = "/images/projects/work1.jpg";
+
 const categories = computed(() => {
-  return [
-    "All",
-    ...new Set(portfolio_data.value.map((item) => item.category)),
-  ];
+  const cleanCategories = portfolioData.value
+    .map((item) => item.category)
+    .filter(Boolean);
+
+  return ["All", ...new Set(cleanCategories)];
 });
+
+const getProjectImage = (imageUrl) => {
+  if (!imageUrl) return fallbackImage;
+
+  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+    return imageUrl;
+  }
+
+  if (imageUrl.startsWith("/")) {
+    return imageUrl;
+  }
+
+  return `/${imageUrl}`;
+};
 
 const fetchProjects = async () => {
   isLoading.value = true;
   errorMessage.value = "";
+
+  const supabase = useSupabase();
 
   const { data, error } = await supabase
     .from("projects")
@@ -45,43 +56,59 @@ const fetchProjects = async () => {
     return;
   }
 
-  portfolio_data.value = data.map((project) => ({
+  portfolioData.value = (data || []).map((project) => ({
     id: project.id,
-    img: project.image_url,
-    category: project.category,
-    title: project.title,
-    description: project.description,
-    project_url: project.project_url,
-    client: project.client,
-    year: project.year,
-    service: project.service,
+    img: getProjectImage(project.image_url),
+    category: project.category || "Project",
+    title: project.title || "Untitled Project",
+    description: project.description || "",
+    project_url: project.project_url || "",
+    client: project.client || "",
+    year: project.year || "",
+    service: project.service || project.category || "",
+    slug: project.slug || "",
+    is_featured: project.is_featured,
+    sort_order: project.sort_order,
   }));
 
-  items.value = portfolio_data.value;
+  items.value = portfolioData.value;
   isLoading.value = false;
 };
 
-const filterItems = (cateItem) => {
-  activeCategory.value = cateItem;
+const filterItems = (category) => {
+  activeCategory.value = category;
 
-  if (cateItem === "All") {
-    items.value = portfolio_data.value;
-  } else {
-    items.value = portfolio_data.value.filter(
-      (item) => item.category === cateItem
-    );
+  if (category === "All") {
+    items.value = portfolioData.value;
+    return;
   }
+
+  items.value = portfolioData.value.filter(
+    (item) => item.category === category
+  );
 };
 
-function handleImagePopup(item) {
-  const originalIndex = portfolio_data.value.findIndex(
+const handleImagePopup = (item) => {
+  const originalIndex = portfolioData.value.findIndex(
     (project) => project.id === item.id
   );
 
   if (image_popup.value && originalIndex !== -1) {
     image_popup.value.showImg(originalIndex);
   }
-}
+};
+
+const getProjectLink = (item) => {
+  if (item.project_url) return item.project_url;
+
+  if (item.slug) return `/single-project/${item.slug}`;
+
+  return "/single-project";
+};
+
+const isExternalLink = (url) => {
+  return url?.startsWith("http://") || url?.startsWith("https://");
+};
 
 onMounted(() => {
   fetchProjects();
@@ -98,8 +125,8 @@ onMounted(() => {
               <div class="section-title text-center wow fadeInUp delay-0-2s">
                 <h2>Works & Projects</h2>
                 <p>
-                  Check out some of my projects, meticulously crafted with
-                  love and dedication, each one reflecting the passion and soul I
+                  Check out some of my projects, meticulously crafted with love
+                  and dedication, each one reflecting the passion and soul I
                   poured into every detail.
                 </p>
               </div>
@@ -116,20 +143,21 @@ onMounted(() => {
 
           <template v-else>
             <ul
+              v-if="portfolioData.length"
               class="project-filter filter-btns-one justify-content-left pb-15 wow fadeInUp delay-0-2s"
             >
-              <li v-for="(item, i) in categories" :key="i">
+              <li v-for="category in categories" :key="category">
                 <a
                   style="cursor: pointer"
-                  @click="filterItems(item)"
-                  :class="item === activeCategory ? 'current' : ''"
+                  @click="filterItems(category)"
+                  :class="category === activeCategory ? 'current' : ''"
                 >
-                  <span>{{ item }}</span>
+                  <span>{{ category }}</span>
                 </a>
               </li>
             </ul>
 
-            <div class="row project-masonry-active">
+            <div v-if="items.length" class="row project-masonry-active">
               <div
                 v-for="item in items"
                 :key="item.id"
@@ -149,15 +177,37 @@ onMounted(() => {
                   </div>
 
                   <div class="project-content">
-                    <span class="sub-title">{{ item.category }}</span>
+                    <span class="sub-title">
+                      {{ item.category }}
+                    </span>
+
                     <h3>
-                      <NuxtLink to="/single-project">
+                      <a
+                        v-if="isExternalLink(getProjectLink(item))"
+                        :href="getProjectLink(item)"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {{ item.title }}
+                      </a>
+
+                      <NuxtLink v-else :to="getProjectLink(item)">
                         {{ item.title }}
                       </NuxtLink>
                     </h3>
+
+                    <p v-if="item.client || item.year" class="project-meta">
+                      <span v-if="item.client">{{ item.client }}</span>
+                      <span v-if="item.client && item.year"> · </span>
+                      <span v-if="item.year">{{ item.year }}</span>
+                    </p>
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div v-else class="text-center py-5">
+              <p>No projects available yet.</p>
             </div>
           </template>
         </div>
@@ -166,7 +216,7 @@ onMounted(() => {
 
     <ImagePopup
       ref="image_popup"
-      :images="portfolio_data.map((item) => item.img)"
+      :images="portfolioData.map((item) => item.img)"
     />
   </div>
 </template>

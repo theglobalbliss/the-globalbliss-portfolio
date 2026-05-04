@@ -1,7 +1,7 @@
 ﻿/*
 * ----------------------------------------------------------------------------------------
-Author       : Hridoy
-Template Name: Bentos - Personal Portfolio HTML Template
+Author       : Anuoluwapo Bliss
+Template Name: Personal Portfolio Website
 Version      : 1.0                                          
 * ----------------------------------------------------------------------------------------
 */
@@ -3059,4 +3059,405 @@ a span{
 }
 h3 a{
     color: #9f9f9f !important;
+}
+
+/* ==========================================================
+   GLOBALBLISS TESTIMONIAL SECTION
+   Added for HomeTestimonialArea.vue
+========================================================== */
+
+.testimonials-area {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.testimonials-area .container-inner {
+    padding: 40px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 20px;
+    box-shadow:
+        rgba(255, 255, 255, 0.025) 0px 0.362176px 0.651917px -1px inset,
+        rgba(255, 255, 255, 0.036) 0px 3px 5.4px -2px inset;
+    background-color: #121214;
+}
+
+.testimonial-item {
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    transition: 0.5s ease;
+    padding: 30px;
+    border-radius: 18px;
+    border: 1px solid var(--border-color);
+    background:
+        radial-gradient(circle at top right, rgba(235, 93, 58, 0.08), transparent 35%),
+        #101010;
+}
+
+.testimonial-item::before {
+    content: "";
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    right: -75px;
+    top: -75px;
+    border-radius: 50%;
+    background: rgba(235, 93, 58, 0.14);
+    filter: blur(10px);
+    opacity: 0;
+    transition: 0.5s ease;
+}
+
+.testimonial-item:hover {
+    transform: translateY(-8px);
+    border-color: var(--primary-color);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.28);
+}
+
+.testimonial-item:hover::before {
+    opacity: 1;
+}
+
+.testimonial-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+}
+
+.testimonial-avatar {
+    width: 62px;
+    height: 62px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 18px;
+    background: var(--primary-color);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    box-shadow: 0 15px 35px rgba(235, 93, 58, 0.2);
+}
+
+.testimonial-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.testimonial-top h4 {
+    color: var(--subtitle-color);
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.testimonial-top p {
+    color: rgb(119, 119, 125);
+    margin-bottom: 0;
+    font-size: 14px;
+    line-height: 22px;
+}
+
+.testimonial-stars {
+    color: var(--primary-color);
+    margin-bottom: 18px;
+    position: relative;
+    z-index: 2;
+}
+
+.testimonial-stars i {
+    margin-right: 4px;
+}
+
+.testimonial-message {
+    color: rgb(180, 180, 185);
+    line-height: 1.8;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 2;
+}
+
+/* Keeps compatibility with old testimonial styles */
+.testimonial-item .author {
+    margin-bottom: 25px;
+    display: inline-block;
+}
+
+.testimonial-item .author img {
+    display: inline-block;
+    border-radius: 50%;
+    height: 60px;
+    width: 60px;
+}
+
+.testimonial-item .text {
+    margin-bottom: 30px;
+}
+
+.testimonial-item .testi-des h5 {
+    margin-bottom: 0;
+    color: var(--subtitle-color);
+    font-size: 20px;
+}
+
+.testimonial-item .testi-des span {
+    margin-bottom: 0;
+    color: rgb(119, 119, 125);
+    font-size: 14px;
+    line-height: 22px;
+}
+
+.testimonial-item:hover .author:before {
+    color: var(--black-color);
+    background: var(--primary-color);
+}
+
+.testimonials-wrap {
+    margin-left: -15px;
+    margin-right: -15px;
+}
+
+.testimonials-wrap .testimonial-item {
+    margin-right: 15px;
+}
+
+.arrow {
+    width: 40px;
+    height: 40px;
+    color: #fff;
+    transition: 0.5s;
+    line-height: 40px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    border: 1px solid var(--button-border);
+}
+
+/* Responsive testimonial styling */
+@media (max-width: 991px) {
+    .testimonial-item {
+        margin-bottom: 24px;
+    }
+}
+
+@media (max-width: 767px) {
+    .testimonials-area {
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+
+    .testimonials-area .container-inner {
+        padding: 25px;
+    }
+
+    .testimonial-item {
+        padding: 24px;
+    }
+
+    .testimonial-top {
+        align-items: flex-start;
+    }
+
+    .testimonial-top h4 {
+        font-size: 18px;
+    }
+
+    .testimonial-avatar {
+        width: 55px;
+        height: 55px;
+        border-radius: 16px;
+    }
+}
+
+/* ==========================================================
+   GLOBALBLISS BLOG PAGE
+========================================================== */
+
+.gb-blog-card {
+    height: 100%;
+    overflow: hidden;
+    margin-bottom: 30px;
+    border-radius: 18px;
+    border: 1px solid var(--border-color);
+    background: #101010;
+    transition: 0.4s ease;
+}
+
+.gb-blog-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--primary-color);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.28);
+}
+
+.gb-blog-image {
+    display: block;
+    height: 240px;
+    overflow: hidden;
+}
+
+.gb-blog-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.4s ease;
+}
+
+.gb-blog-card:hover .gb-blog-image img {
+    transform: scale(1.06);
+}
+
+.gb-blog-content {
+    padding: 26px;
+}
+
+.gb-blog-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    color: var(--primary-color);
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 14px;
+}
+
+.gb-blog-content h3 {
+    font-size: 22px;
+    line-height: 1.35;
+    margin-bottom: 14px;
+}
+
+.gb-blog-content h3 a {
+    color: var(--subtitle-color) !important;
+}
+
+.gb-blog-content h3 a:hover {
+    color: var(--primary-color) !important;
+}
+
+.gb-blog-content p {
+    color: rgb(150, 150, 155);
+    margin-bottom: 20px;
+}
+
+.gb-single-blog {
+    max-width: 950px;
+    margin: 0 auto;
+}
+
+.gb-single-blog-hero {
+    overflow: hidden;
+    border-radius: 22px;
+    margin-bottom: 35px;
+    border: 1px solid var(--border-color);
+}
+
+.gb-single-blog-hero img {
+    width: 100%;
+    max-height: 520px;
+    object-fit: cover;
+}
+
+.gb-single-blog-content h1 {
+    font-size: 52px;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    text-transform: none;
+}
+
+.gb-single-blog-excerpt {
+    color: var(--primary-color);
+    font-size: 18px;
+    line-height: 1.8;
+    margin-bottom: 25px;
+}
+
+.gb-single-blog-body {
+    color: rgb(170, 170, 175);
+    font-size: 17px;
+    line-height: 1.9;
+}
+
+.gb-single-blog-body p {
+    line-height: 1.9;
+}
+
+@media (max-width: 767px) {
+    .gb-blog-image {
+        height: 210px;
+    }
+
+    .gb-single-blog-content h1 {
+        font-size: 34px;
+    }
+
+    .gb-single-blog-body {
+        font-size: 16px;
+    }
+}
+
+/* ==========================================================
+   GLOBALBLISS SINGLE BLOG POST
+========================================================== */
+
+.gb-single-blog {
+    max-width: 950px;
+    margin: 0 auto;
+}
+
+.gb-single-blog-hero {
+    overflow: hidden;
+    border-radius: 22px;
+    margin-bottom: 35px;
+    border: 1px solid var(--border-color);
+    background: #101010;
+}
+
+.gb-single-blog-hero img {
+    width: 100%;
+    max-height: 520px;
+    object-fit: cover;
+    display: block;
+}
+
+.gb-single-blog-content h1 {
+    font-size: 52px;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    text-transform: none;
+}
+
+.gb-single-blog-excerpt {
+    color: var(--primary-color);
+    font-size: 18px;
+    line-height: 1.8;
+    margin-bottom: 25px;
+}
+
+.gb-single-blog-body {
+    color: rgb(170, 170, 175);
+    font-size: 17px;
+    line-height: 1.9;
+}
+
+.gb-single-blog-body p {
+    line-height: 1.9;
+}
+
+.gb-single-blog-footer {
+    margin-top: 35px;
+    padding-top: 25px;
+    border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 767px) {
+    .gb-single-blog-content h1 {
+        font-size: 34px;
+    }
+
+    .gb-single-blog-body {
+        font-size: 16px;
+    }
 }

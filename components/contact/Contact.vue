@@ -1,33 +1,55 @@
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
-const formStatus = ref('');
+const formStatus = ref("");
 const isSubmitting = ref(false);
 
 const submitForm = async (event) => {
   isSubmitting.value = true;
-  formStatus.value = '';
+  formStatus.value = "";
 
   const form = event.target;
   const formData = new FormData(form);
 
+  const name = formData.get("name");
+  const email = formData.get("email");
+  const message = formData.get("message");
+
   try {
-    const response = await fetch('https://formspree.io/f/mjkalwdd', {
-      method: 'POST',
+    const formspreeResponse = await fetch("https://formspree.io/f/mjkalwdd", {
+      method: "POST",
       body: formData,
       headers: {
-        Accept: 'application/json',
+        Accept: "application/json",
       },
     });
 
-    if (response.ok) {
-      formStatus.value = 'Message sent successfully!';
-      form.reset();
-    } else {
-      formStatus.value = 'Something went wrong. Please try again.';
+    if (!formspreeResponse.ok) {
+      formStatus.value = "Something went wrong. Please try again.";
+      isSubmitting.value = false;
+      return;
     }
+
+    const { sendContactMessage } = useContactMessages();
+
+    const supabaseResponse = await sendContactMessage({
+      name,
+      email,
+      subject: "New message from The GlobalBliss portfolio",
+      message,
+    });
+
+    if (!supabaseResponse.success) {
+      formStatus.value =
+        "Message sent to email, but could not save to admin dashboard.";
+      isSubmitting.value = false;
+      return;
+    }
+
+    formStatus.value = "Message sent successfully!";
+    form.reset();
   } catch (error) {
-    formStatus.value = 'Network error. Please check your connection.';
+    formStatus.value = "Network error. Please check your connection.";
   } finally {
     isSubmitting.value = false;
   }
@@ -54,6 +76,7 @@ const submitForm = async (event) => {
                 <div class="contact-icon">
                   <i class="ri-map-pin-line"></i>
                 </div>
+
                 <h2>Location:</h2>
                 <p>Lagos, Nigeria</p>
               </div>
@@ -62,6 +85,7 @@ const submitForm = async (event) => {
                 <div class="contact-icon">
                   <i class="ri-phone-line"></i>
                 </div>
+
                 <h2>Contact number:</h2>
                 <p>+234 906 408 9633</p>
               </div>
@@ -70,6 +94,7 @@ const submitForm = async (event) => {
                 <div class="contact-icon">
                   <i class="ri-mail-line"></i>
                 </div>
+
                 <h2>Email us:</h2>
                 <p>theglobalbliss@gmail.com</p>
               </div>
@@ -88,6 +113,7 @@ const submitForm = async (event) => {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="name">Full Name</label>
+
                       <input
                         type="text"
                         id="name"
@@ -96,9 +122,11 @@ const submitForm = async (event) => {
                         placeholder="Anuoluwapo Bliss"
                         required
                       />
+
                       <label for="name" class="for-icon">
                         <i class="far fa-user"></i>
                       </label>
+
                       <div class="help-block with-errors"></div>
                     </div>
                   </div>
@@ -106,6 +134,7 @@ const submitForm = async (event) => {
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="email">Email Address</label>
+
                       <input
                         type="email"
                         id="email"
@@ -114,9 +143,11 @@ const submitForm = async (event) => {
                         placeholder="theglobalbliss@gmail.com"
                         required
                       />
+
                       <label for="email" class="for-icon">
                         <i class="far fa-envelope"></i>
                       </label>
+
                       <div class="help-block with-errors"></div>
                     </div>
                   </div>
@@ -124,6 +155,7 @@ const submitForm = async (event) => {
                   <div class="col-md-12">
                     <div class="form-group">
                       <label for="message">Your Message</label>
+
                       <textarea
                         name="message"
                         id="message"
@@ -132,6 +164,7 @@ const submitForm = async (event) => {
                         placeholder="Write your message"
                         required
                       ></textarea>
+
                       <div class="help-block with-errors"></div>
                     </div>
                   </div>
@@ -143,7 +176,7 @@ const submitForm = async (event) => {
                         class="theme-btn"
                         :disabled="isSubmitting"
                       >
-                        {{ isSubmitting ? 'Sending...' : 'Send Me Message' }}
+                        {{ isSubmitting ? "Sending..." : "Send Me Message" }}
                         <i class="ri-mail-line"></i>
                       </button>
 
@@ -152,7 +185,9 @@ const submitForm = async (event) => {
                         class="mt-3"
                         :class="{
                           'text-success': formStatus === 'Message sent successfully!',
-                          'text-danger': formStatus !== 'Message sent successfully!' && formStatus !== ''
+                          'text-danger':
+                            formStatus !== 'Message sent successfully!' &&
+                            formStatus !== ''
                         }"
                       >
                         {{ formStatus }}
@@ -164,7 +199,6 @@ const submitForm = async (event) => {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </section>

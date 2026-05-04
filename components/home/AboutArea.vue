@@ -1,7 +1,51 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from "vue";
 
-onMounted(() => {
+const aboutContent = ref({
+  title: "I'm Anuoluwapo Bliss, a graphic designer and website developer creating clean, visually compelling designs and functional websites with purpose and precision.",
+  subtitle: "Hello There!",
+  body: "Available for Freelancing and Remote Employment",
+  button_text: "Download CV",
+  button_url: "/files/Anuoluwapo-Bliss-CV.pdf",
+});
+
+const socialLinks = ref({
+  facebook_url: "https://www.facebook.com/profile.php?id=61574968987811",
+  twitter_url: "https://x.com/anuoluwapobliss",
+  linkedin_url: "https://linkedin.com",
+  github_url: "https://github.com/theglobalbliss",
+});
+
+const fetchAboutContent = async () => {
+  const { getHomepageSection } = useHomepageContent();
+
+  const data = await getHomepageSection("about");
+
+  if (data) {
+    aboutContent.value = {
+      title: data.title || aboutContent.value.title,
+      subtitle: data.subtitle || aboutContent.value.subtitle,
+      body: data.body || aboutContent.value.body,
+      button_text: data.button_text || aboutContent.value.button_text,
+      button_url: data.button_url || aboutContent.value.button_url,
+    };
+  }
+};
+
+const fetchSocialLinks = async () => {
+  const { getSiteSettings } = useSiteSettings();
+
+  const settings = await getSiteSettings();
+
+  socialLinks.value = {
+    facebook_url: settings.facebook_url || socialLinks.value.facebook_url,
+    twitter_url: settings.twitter_url || socialLinks.value.twitter_url,
+    linkedin_url: settings.linkedin_url || socialLinks.value.linkedin_url,
+    github_url: settings.github_url || socialLinks.value.github_url,
+  };
+};
+
+const setupScrollerAnimation = () => {
   const scrollers = document.querySelectorAll(".scroller");
 
   if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -10,6 +54,8 @@ onMounted(() => {
 
   function addAnimation(scrollers) {
     scrollers.forEach((scroller) => {
+      if (scroller.getAttribute("data-animated") === "true") return;
+
       scroller.setAttribute("data-animated", true);
 
       const scrollerInner = scroller.querySelector(".scroller__inner");
@@ -25,6 +71,12 @@ onMounted(() => {
       });
     });
   }
+};
+
+onMounted(async () => {
+  await fetchAboutContent();
+  await fetchSocialLinks();
+  setupScrollerAnimation();
 });
 </script>
 
@@ -32,7 +84,6 @@ onMounted(() => {
   <section id="about" class="about-area">
     <div class="container">
       <div class="row">
-        <!-- START ABOUT IMAGE DESIGN AREA -->
         <div class="col-lg-4">
           <div class="about-image-part wow fadeInUp delay-0-3s">
             <img src="~/assets/images/about/profile.png" alt="Anuoluwapo Bliss" />
@@ -42,26 +93,26 @@ onMounted(() => {
 
             <div class="about-social text-center">
               <ul>
-                <li>
-                  <a href="https://www.facebook.com/profile.php?id=61574968987811" target="_blank">
+                <li v-if="socialLinks.facebook_url">
+                  <a :href="socialLinks.facebook_url" target="_blank">
                     <i class="ri-facebook-circle-fill"></i>
                   </a>
                 </li>
 
-                <li>
-                  <a href="https://x.com/anuoluwapobliss" target="_blank">
+                <li v-if="socialLinks.twitter_url">
+                  <a :href="socialLinks.twitter_url" target="_blank">
                     <i class="ri-twitter-x-line"></i>
                   </a>
                 </li>
 
-                <li>
-                  <a href="https://linkedin.com" target="_blank">
+                <li v-if="socialLinks.linkedin_url">
+                  <a :href="socialLinks.linkedin_url" target="_blank">
                     <i class="ri-linkedin-fill"></i>
                   </a>
                 </li>
 
-                <li>
-                  <a href="https://github.com/theglobalbliss" target="_blank">
+                <li v-if="socialLinks.github_url">
+                  <a :href="socialLinks.github_url" target="_blank">
                     <i class="ri-github-line"></i>
                   </a>
                 </li>
@@ -69,34 +120,32 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <!-- / END ABOUT IMAGE DESIGN AREA -->
 
-        <!-- START ABOUT TEXT DESIGN AREA -->
         <div class="col-lg-8">
           <div class="about-content-part wow fadeInUp delay-0-2s">
-            <p>Hello There!</p>
+            <p>{{ aboutContent.subtitle }}</p>
 
             <h2>
-              {{"I'm"}} Anuoluwapo Bliss, a graphic designer and website developer creating clean,
-              visually compelling designs and functional websites with purpose and precision.
+              {{ aboutContent.title }}
             </h2>
 
             <div class="adress-field">
               <ul>
                 <li>
                   <i class="ri-circle-fill"></i>
-                  Available for Freelancing and Remote Employment
+                  {{ aboutContent.body }}
                 </li>
               </ul>
             </div>
 
             <div class="hero-btns">
               <a
-                href="/files/Anuoluwapo-Bliss-CV.pdf"
-                download="Anuoluwapo-Bliss-CV.pdf"
+                :href="aboutContent.button_url"
+                :download="aboutContent.button_url.includes('.pdf') ? 'Anuoluwapo-Bliss-CV.pdf' : null"
                 class="theme-btn"
               >
-                Download CV <i class="ri-download-line"></i>
+                {{ aboutContent.button_text }}
+                <i class="ri-download-line"></i>
               </a>
             </div>
           </div>
@@ -118,7 +167,6 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <!-- / END ABOUT TEXT DESIGN AREA -->
       </div>
     </div>
   </section>

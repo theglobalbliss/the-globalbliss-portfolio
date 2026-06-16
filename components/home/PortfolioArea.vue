@@ -5,90 +5,96 @@ const props = defineProps({
   cls: String,
 });
 
-const portfolioData = ref([]);
-const items = ref([]);
+const supabase = useSupabase();
+
+const projects = ref([]);
+const filteredProjects = ref([]);
 const activeCategory = ref("All");
+
 const isLoading = ref(true);
 const errorMessage = ref("");
 
 const fallbackImage = "/images/projects/work1.jpg";
 
-const categories = computed(() => {
-  const cleanCategories = portfolioData.value
-    .map((item) => item.category)
-    .filter(Boolean);
-
-  return ["All", ...new Set(cleanCategories)];
-});
-
-const getProjectImage = (imageUrl) => {
-  if (!imageUrl) return fallbackImage;
-
-  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
-    return imageUrl;
-  }
-
-  if (imageUrl.startsWith("/")) {
-    return imageUrl;
-  }
-
-  return `/${imageUrl}`;
+/**
+ * Normalize image path safely
+ */
+const getImage = (url) => {
+  if (!url) return fallbackImage;
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/")) return url;
+  return `/${url}`;
 };
 
-const getProjectLink = (item) => {
-  return `/single-project?id=${item.id}`;
-};
-
+/**
+ * Fetch ALL projects (NO LIMIT, NO FEATURE FILTER)
+ * This fixes your “only 6 projects” issue
+ */
 const fetchProjects = async () => {
   isLoading.value = true;
   errorMessage.value = "";
 
   try {
-    const supabase = useSupabase();
-
     const { data, error } = await supabase
       .from("projects")
-      .select(
-        "id, title, category, description, image_url, is_featured, sort_order"
-      )
-      .eq("is_featured", true)
-      .order("sort_order", { ascending: true })
-      .limit(6);
+      .select("*")
+      .order("sort_order", { ascending: true });
 
-    if (error) {
-      throw error;
+    if (error) throw error;
+
+    if (!data || data.length === 0) {
+      projects.value = [];
+      filteredProjects.value = [];
+      return;
     }
 
-    portfolioData.value = (data || []).map((project) => ({
-      id: project.id,
-      img: getProjectImage(project.image_url),
-      category: project.category || "Project",
-      title: project.title || "Untitled Project",
-      description: project.description || "",
-      is_featured: project.is_featured,
-      sort_order: project.sort_order,
+    projects.value = data.map((p) => ({
+      id: p.id,
+      title: p.title || "Untitled Project",
+      category: p.category || "General",
+      description: p.description || "",
+      image: getImage(p.image_url),
+      slug: p.slug,
     }));
 
-    items.value = portfolioData.value;
-  } catch (error) {
-    console.error("Error loading projects:", error.message);
-    errorMessage.value = "Unable to load projects at the moment.";
+    filteredProjects.value = projects.value;
+  } catch (err) {
+    console.error("Project fetch error:", err);
+    errorMessage.value = "Unable to load projects. Please try again later.";
   } finally {
     isLoading.value = false;
   }
 };
 
-const filterItems = (category) => {
+/**
+ * Categories (auto-generated)
+ */
+const categories = computed(() => {
+  const list = projects.value.map((p) => p.category);
+  return ["All", ...new Set(list)];
+});
+
+/**
+ * Filter logic
+ */
+const filterProjects = (category) => {
   activeCategory.value = category;
 
   if (category === "All") {
-    items.value = portfolioData.value;
+    filteredProjects.value = projects.value;
     return;
   }
 
-  items.value = portfolioData.value.filter(
-    (item) => item.category === category
+  filteredProjects.value = projects.value.filter(
+    (p) => p.category === category
   );
+};
+
+/**
+ * Safe link handling
+ */
+const getLink = (item) => {
+  return `/single-project?id=${item.id}`;
 };
 
 onMounted(() => {
@@ -97,92 +103,77 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <section id="portfolio" :class="`portfolio-area ${props.cls || ''}`">
-      <div class="container">
-        <div class="container-inner">
-          <div class="row">
-            <div class="col-xl-12 col-lg-12">
-              <div class="section-title text-center wow fadeInUp delay-0-2s">
-                <h2>Works & Projects</h2>
-                <p>
-                  Check out some of my projects, meticulously crafted with love
-                  and dedication, each one reflecting the passion and soul I
-                  poured into every detail.
-                </p>
-              </div>
-            </div>
-          </div>
+  <section :class="`portfolio-area ${props.cls || ''}`">
+    <div class="container">
 
-          <div v-if="isLoading" class="text-center py-5">
-            <p>Loading projects...</p>
-          </div>
-
-          <div v-else-if="errorMessage" class="text-center py-5">
-            <p>{{ errorMessage }}</p>
-          </div>
-
-          <template v-else>
-            <ul
-              v-if="portfolioData.length"
-              class="project-filter filter-btns-one justify-content-left pb-15 wow fadeInUp delay-0-2s"
-            >
-              <li v-for="category in categories" :key="category">
-                <a
-                  style="cursor: pointer"
-                  @click="filterItems(category)"
-                  :class="category === activeCategory ? 'current' : ''"
-                >
-                  <span>{{ category }}</span>
-                </a>
-              </li>
-            </ul>
-
-            <div v-if="items.length" class="row project-masonry-active">
-              <div
-                v-for="item in items"
-                :key="item.id"
-                class="col-lg-4 col-md-6 item branding game"
-              >
-                <div class="project-item style-two wow fadeInUp delay-0-3s">
-                  <div class="project-image">
-                    <img
-                      :src="item.img"
-                      :alt="item.title"
-                      loading="lazy"
-                      decoding="async"
-                    />
-
-                    <NuxtLink
-                      :to="getProjectLink(item)"
-                      class="details-btn"
-                      aria-label="View project"
-                    >
-                      <i class="ri-arrow-right-up-line"></i>
-                    </NuxtLink>
-                  </div>
-
-                  <div class="project-content">
-                    <span class="sub-title">
-                      {{ item.category }}
-                    </span>
-
-                    <h3>
-                      <NuxtLink :to="getProjectLink(item)">
-                        {{ item.title }}
-                      </NuxtLink>
-                    </h3>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div v-else class="text-center py-5">
-              <p>No projects available yet.</p>
-            </div>
-          </template>
-        </div>
+      <!-- TITLE -->
+      <div class="text-center mb-4">
+        <h2>Works & Projects</h2>
+        <p>Selected creative works and brand projects.</p>
       </div>
-    </section>
-  </div>
+
+      <!-- LOADING -->
+      <div v-if="isLoading" class="text-center py-5">
+        Loading projects...
+      </div>
+
+      <!-- ERROR -->
+      <div v-else-if="errorMessage" class="text-center py-5">
+        {{ errorMessage }}
+      </div>
+
+      <!-- CONTENT -->
+      <div v-else>
+
+        <!-- FILTER -->
+        <div v-if="projects.length" class="mb-4 text-center">
+          <button
+            v-for="cat in categories"
+            :key="cat"
+            @click="filterProjects(cat)"
+            :class="['mx-2', activeCategory === cat ? 'active' : '']"
+          >
+            {{ cat }}
+          </button>
+        </div>
+
+        <!-- GRID -->
+        <div v-if="filteredProjects.length" class="row">
+
+          <div
+            v-for="project in filteredProjects"
+            :key="project.id"
+            class="col-lg-4 col-md-6 mb-4"
+          >
+            <div class="project-card">
+
+              <img
+                :src="project.image"
+                :alt="project.title"
+                loading="lazy"
+              />
+
+              <div class="p-3">
+                <small>{{ project.category }}</small>
+
+                <h3>{{ project.title }}</h3>
+
+                <NuxtLink :to="getLink(project)">
+                  View Project →
+                </NuxtLink>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- EMPTY STATE -->
+        <div v-else class="text-center py-5">
+          No projects found.
+        </div>
+
+      </div>
+    </div>
+  </section>
 </template>
